@@ -107,7 +107,7 @@ class Content extends React.Component {
 			.then( ( response ) => {
 				//this.setState({ tasks: response.data.data.key_results });
 				return(
-					<Tasks tasks={ response.data.data.key_results }/>
+					<Tasks tasks={ response.data.data.key_results } objectiveId={ id }/>
 				)
 			} );
 	}

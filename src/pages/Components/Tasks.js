@@ -14,7 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 import SettingsIcon from '@mui/icons-material/Settings';
 
-import AddCategoryDialog from "./AddCategoryDialog";
+import AddTaskDialog from "./AddTaskDialog";
 
 import axios from "../../lib/axios";
 
@@ -35,8 +35,8 @@ const Divider = styled( MuiDivider )( () => ( {
 } ) );
 const WorkingContainer = styled( 'div' )( () => ( {
 	display: "flex", flexDirection: "row", gap: 50,
-	transition: "margin 1s ease", margin: "0 2.5%",
-	flexWrap: "wrap", height: "800px", overflowY: "auto",
+	transition: "margin 1s ease",
+	flexWrap: "wrap", overflowY: "auto",
 	justifyContent: "center", alignContent: "flex-start"
 } ) );
 const DeleteObjective = styled( 'div' )( () => ( {
@@ -66,8 +66,7 @@ const AddIcon = styled( 'span' )( () => ( {
 const TaskContainer = styled( 'div' )( () => ( {
 	width: 300,	height: "fit-content",
 	backgroundColor: "#BBB",
-	color: "#000",
-	padding: 20
+	color: "#000"
 } ) );
 const TaskTitle = styled( 'span' )( () => ( {
 	fontFamily: "Rubik", fontWeight: 500,
@@ -92,14 +91,14 @@ class Tasks extends React.Component {
 	}
 	addNewObjective = ( ) => {
 		axios
-			.get( "/api/projects/" + this.props.projectId, { headers: { "authorization": 'Bearer ' + localStorage.getItem("token"), } } )
+			.get( "/api/objectives/" + this.props.objectiveId, { headers: { "authorization": 'Bearer ' + localStorage.getItem("token"), } } )
 			.then( response => {
-				this.props.setProjectId( this.props.projectId );
+				this.setState({ tasks: response.data.data.key_results });
 			});
 	}
 	deleteObjective = ( id ) => {
 		axios
-			.delete( "/api/objectives/" + id, { headers: { "authorization": 'Bearer ' + localStorage.getItem("token"), } } )
+			.delete( "/api/keyResults/" + id, { headers: { "authorization": 'Bearer ' + localStorage.getItem("token"), } } )
 			.then( ( response ) => {
 				this.props.setProjectId( this.props.projectId );
 			} );
@@ -109,62 +108,65 @@ class Tasks extends React.Component {
 	}
 
 	render(){
-		console.log("asdasd")
 		return (
-			<Root style={{ marginLeft: this.props.openDrawer ? drawerWidth : closedDrawerWidth }}>
-				<Divider/>
+			<Root>
 				<WorkingContainer>
 				{
 					this.state.tasks.map( category => {
 						return(
-							<TaskContainer>
-								{/* <div style={{ display: "flex", justifyContent: "space-between" }}>
-									<TaskTitle key={ category.id }>{ category.name }</TaskTitle>
-									<DeleteObjective onClick={ ( ) => this.deleteObjective( category.id ) }>Delete</DeleteObjective>
-								</div>
-								<br/>
-								<span>Progress:</span>
-								<div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 10 }}>
-									<div style={{ width: "100%" }}>
-										<LinearProgress variant="determinate" value={ 50 }/>
+							category.name !== ""
+							?
+								<TaskContainer>
+									<span>{ category.title }</span>
+									{/* <div style={{ display: "flex", justifyContent: "space-between" }}>
+										<TaskTitle key={ category.id }>{ category.name }</TaskTitle>
+										<DeleteObjective onClick={ ( ) => this.deleteObjective( category.id ) }>Delete</DeleteObjective>
 									</div>
-									<div style={{ minWidth: 20 }}>
-										<span>50%</span>
+									<br/>
+									<span>Progress:</span>
+									<div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 10 }}>
+										<div style={{ width: "100%" }}>
+											<LinearProgress variant="determinate" value={ 50 }/>
+										</div>
+										<div style={{ minWidth: 20 }}>
+											<span>50%</span>
+										</div>
 									</div>
-								</div>
-								<br/>
-								<br/>
-								<span>Tasks:</span>
-								<br/>
-								<br/>
-								{
-									category.key_results > 0
-									?
-									category.key_results.map( keyResult => {
-										return(
-											<div key={ keyResult.id }>
-												<span style={{ fontFamily: "Rubik", fontSize: 18, fontWeight: 600, color: keyResult.done ? "#2AA000" : "#212121" }}>{ keyResult.name }</span>
-												<br/>
-												<br/>
-											</div>
-										)
-									} )
-									:
-									<></>
-								}
-								<span>{  }</span> */}
-							</TaskContainer>
+									<br/>
+									<br/>
+									<span>Tasks:</span>
+									<br/>
+									<br/>
+									{
+										category.key_results > 0
+										?
+										category.key_results.map( keyResult => {
+											return(
+												<div key={ keyResult.id }>
+													<span style={{ fontFamily: "Rubik", fontSize: 18, fontWeight: 600, color: keyResult.done ? "#2AA000" : "#212121" }}>{ keyResult.name }</span>
+													<br/>
+													<br/>
+												</div>
+											)
+										} )
+										:
+										<></>
+									}
+									<span>{  }</span> */}
+								</TaskContainer>
+							:
+							<></>
 						)
 					} )
 				}
 
 
 				<AddCategory onClick={ this.toggleDialog }>
-					<AddIcon>Add objective</AddIcon>
+					<AddIcon>Add task</AddIcon>
 				</AddCategory>
 				</WorkingContainer>
 	
-				<AddCategoryDialog open={ this.state.openCategoryDialog } closeDialog={ this.toggleDialog } projectId={ this.props.projectId } addNewObjective={ this.addNewObjective }/>
+				<AddTaskDialog open={ this.state.openCategoryDialog } closeDialog={ this.toggleDialog } objectiveId={ this.props.objectiveId } addNewObjective={ this.addNewObjective }/>
 			</Root>
 		)
 	}
